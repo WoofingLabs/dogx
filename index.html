@@ -17,7 +17,7 @@
             line-height: 1.5; 
         }
         .container { 
-            max-width: 1100px; 
+            max-width: 800px; 
             margin: 0 auto; 
             padding: 30px; 
             background: #1A1A1A; 
@@ -48,14 +48,15 @@
         .button { 
             background: #00BFA5; 
             color: #121212; 
-            padding: 10px 20px; 
+            padding: 12px 24px; 
             border: none; 
             border-radius: 6px; 
             font-weight: 600; 
             font-size: 1em; 
             cursor: pointer; 
             transition: background 0.3s ease, transform 0.2s ease; 
-            margin: 5px; 
+            margin: 10px 0; 
+            width: 100%; 
         }
         .button:hover { 
             background: #009688; 
@@ -70,11 +71,20 @@
             margin-top: 10px; 
             font-size: 0.9em; 
             color: #00BFA5; 
+            word-break: break-word; 
+        }
+        .error { 
+            color: #FF5252; 
         }
         .wallet-info { 
             color: #00BFA5; 
             font-weight: 600; 
             word-break: break-all; 
+        }
+        .balance-info { 
+            margin-top: 10px; 
+            font-size: 0.95em; 
+            color: #E6E6E6; 
         }
         .loading { 
             opacity: 0.7; 
@@ -116,8 +126,7 @@
         @media (max-width: 768px) {
             .container { padding: 15px; }
             .section, .how-it-works { padding: 15px; }
-            .button { width: 100%; padding: 12px; margin: 8px 0; }
-            .how-it-works ul { padding-left: 15px; }
+            .button { padding: 12px; }
             .how-it-works li { font-size: 0.85em; }
         }
     </style>
@@ -129,12 +138,13 @@
             <h2>Connect to X Layer</h2>
             <button id="connectButton" class="button">Connect Wallet</button>
             <p>Wallet: <span id="walletAddress" class="wallet-info">Not connected</span></p>
-            <div id="networkStatus" class="status">Click to connect...</div>
+            <div id="networkStatus" class="status"></div>
         </div>
         <div class="section" id="mintTokenSection">
             <h2>Mint XDOG Tokens</h2>
             <p>Token: XDOG (DOGX) | Address: <a href="https://www.okx.com/web3/explorer/xlayer/address/0xa383a75ee8cae132cb51f615d6716770b77ca5aa" target="_blank">0xa383...a5aa</a></p>
-            <p>Each mint creates <span class="highlight">100,000,000,000 DOGX</span> for you (80%) and airdrops 20% to 160 random addresses. Max supply: <span class="highlight">1,000,000,000,000,000 DOGX</span>.</p>
+            <p>Each mint creates <span class="highlight">100,000,000,000 DOGX</span> (80% to you, 20% airdropped to 160 random addresses). Max supply: <span class="highlight">1,000,000,000,000,000 DOGX</span>.</p>
+            <p class="balance-info">Your XDOG Balance: <span id="xdogBalance">0 DOGX</span></p>
             <button id="mintToken" class="button">Mint XDOG</button>
             <div id="mintStatus" class="status"></div>
         </div>
@@ -143,9 +153,9 @@
             <p>Mint XDOG tokens on X Layer with ease:</p>
             <ul>
                 <li><strong>Connect Your Wallet</strong>: Use MetaMask to connect to X Layer (chain ID: 196). Ensure you have enough <span class="highlight">OKB</span> for gas fees.</li>
-                <li><strong>Mint XDOG Tokens</strong>: Click "Mint XDOG" to receive 80% of 100,000,000,000 DOGX tokens. The remaining 20% is airdropped to 160 random addresses.</li>
-                <li><strong>Check Your Balance</strong>: View your XDOG balance in your wallet or on the X Layer explorer.</li>
-                <li><strong>Fair & Secure</strong>: Built on X Layer for low fees and secure minting. The contract is decentralized with ownership renounced.</li>
+                <li><strong>Mint XDOG Tokens</strong>: Click "Mint XDOG" to receive 80,000,000,000 DOGX tokens. 20,000,000,000 DOGX is airdropped to 160 random addresses.</li>
+                <li><strong>Check Your Balance</strong>: Your XDOG balance updates here after minting, or check the X Layer explorer.</li>
+                <li><strong>Fair & Secure</strong>: Built on X Layer for low fees. The contract is decentralized with ownership renounced.</li>
             </ul>
         </div>
         <div class="footer">
@@ -182,6 +192,13 @@
             {
                 "inputs": [],
                 "name": "totalSupply",
+                "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+                "name": "balanceOf",
                 "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
                 "stateMutability": "view",
                 "type": "function"
@@ -245,30 +262,75 @@
                 document.getElementById('walletAddress').innerText = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
                 xdogContract = new web3.eth.Contract(xdogABI, xdogAddress);
                 status.innerText = "Connected to X Layer";
+                await updateBalance();
             } catch (error) {
                 console.error(error);
-                status.innerText = "Failed to connect: " + error.message;
+                status.innerText = `Failed to connect: ${error.message.includes('user rejected') ? 'You rejected the connection.' : 'Please try again.'}`;
+                status.classList.add('error');
+            }
+        }
+
+        async function updateBalance() {
+            if (!accounts || !xdogContract) return;
+            try {
+                const balance = await xdogContract.methods.balanceOf(accounts[0]).call();
+                const formattedBalance = (balance / 1e18).toLocaleString('en-US', { maximumFractionDigits: 2 });
+                document.getElementById('xdogBalance').innerText = `${formattedBalance} DOGX`;
+            } catch (error) {
+                console.error('Failed to fetch balance:', error);
+                document.getElementById('xdogBalance').innerText = 'Error fetching balance';
+            }
+        }
+
+        async function withRetry(fn, maxAttempts = 3, delayMs = 2000) {
+            for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+                try {
+                    return await fn();
+                } catch (error) {
+                    if (error.code === -32005 && attempt < maxAttempts) {
+                        console.warn(`Rate limit hit, retrying (${attempt}/${maxAttempts})...`);
+                        await new Promise(resolve => setTimeout(resolve, delayMs * attempt));
+                        continue;
+                    }
+                    throw error;
+                }
             }
         }
 
         async function mintToken() {
             const section = document.getElementById('mintTokenSection');
             const status = document.getElementById('mintStatus');
-            if (!accounts) return alert("Please connect your wallet first!");
+            if (!accounts || !xdogContract) {
+                status.innerText = "Please connect your wallet first!";
+                status.classList.add('error');
+                return;
+            }
             try {
                 section.classList.add('loading');
                 status.innerText = "Minting XDOG tokens...";
+                status.classList.remove('error');
                 const gasPrice = await web3.eth.getGasPrice();
-                const adjustedGasPrice = web3.utils.toBN(gasPrice).mul(web3.utils.toBN(15)).div(web3.utils.toBN(10));
-                const tx = await xdogContract.methods.mint().send({
+                const adjustedGasPrice = web3.utils.toBN(gasPrice).mul(web3.utils.toBN(12)).div(web3.utils.toBN(10)); // 1.2x gas price
+                const gasEstimate = await withRetry(() => xdogContract.methods.mint().estimateGas({ from: accounts[0] }));
+                const tx = await withRetry(() => xdogContract.methods.mint().send({
                     from: accounts[0],
-                    gas: '5000000', // Increased gas limit due to airdrop loop
+                    gas: Math.min(Math.floor(gasEstimate * 1.5), 6000000), // Cap at 6M gas
                     gasPrice: adjustedGasPrice
-                });
-                status.innerHTML = `Minted 100,000,000,000 DOGX! Check: <a href="${xLayer.explorerUrl}/tx/${tx.transactionHash}" target="_blank">Transaction</a>`;
+                }));
+                status.innerHTML = `Minted 80,000,000,000 DOGX! <a href="${xLayer.explorerUrl}/tx/${tx.transactionHash}" target="_blank">View Transaction</a>`;
+                await updateBalance();
             } catch (error) {
                 console.error(error);
-                status.innerText = "Failed to mint XDOG: " + (error.message.includes('revert') ? error.message.split('revert')[1]?.trim() || 'Unknown reason' : error.message);
+                let errorMessage = 'Failed to mint XDOG.';
+                if (error.message.includes('revert')) {
+                    errorMessage = error.message.split('revert')[1]?.trim() || 'Transaction failed.';
+                } else if (error.code === -32005) {
+                    errorMessage = 'Rate limit exceeded. Please wait and try again.';
+                } else if (error.message.includes('user rejected')) {
+                    errorMessage = 'You rejected the transaction.';
+                }
+                status.innerText = errorMessage;
+                status.classList.add('error');
             } finally {
                 section.classList.remove('loading');
             }
@@ -278,10 +340,15 @@
         document.getElementById('mintToken').addEventListener('click', mintToken);
 
         window.addEventListener('load', () => {
+            const status = document.getElementById('networkStatus');
             if (!window.location.protocol.startsWith('http')) {
-                document.getElementById('networkStatus').innerHTML = 'Please run this page via a local server (e.g., "npx serve") to connect MetaMask.';
+                status.innerHTML = 'Please run this page via a local server (e.g., "npx serve") to connect MetaMask.';
+                status.classList.add('error');
             } else if (!window.ethereum) {
-                document.getElementById('networkStatus').innerHTML = 'No wallet detected. Please install <a href="https://metamask.io">MetaMask</a>.';
+                status.innerHTML = 'No wallet detected. Please install <a href="https://metamask.io" target="_blank">MetaMask</a>.';
+                status.classList.add('error');
+            } else {
+                status.innerText = "Click to connect...";
             }
         });
     </script>
