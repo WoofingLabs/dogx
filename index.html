@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XDOG Minting - X Layer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://woofingjace.com/images/jace.png" type="image/x-icon">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #121212; 
+            color: #E6E6E6; 
+            padding: 20px; 
+            min-height: 100vh; 
+            line-height: 1.5; 
+        }
+        .container { 
+            max-width: 1100px; 
+            margin: 0 auto; 
+            padding: 30px; 
+            background: #1A1A1A; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); 
+        }
+        h1 { 
+            text-align: center; 
+            color: #00BFA5; 
+            font-size: clamp(1.8em, 5vw, 2.5em); 
+            margin-bottom: 25px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+        }
+        .section { 
+            background: #222222; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border-radius: 8px; 
+            border: 1px solid #00BFA5; 
+        }
+        h2 { 
+            color: #00BFA5; 
+            font-size: clamp(1.2em, 3.5vw, 1.6em); 
+            margin-bottom: 15px; 
+            font-weight: 600; 
+        }
+        .button { 
+            background: #00BFA5; 
+            color: #121212; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            font-size: 1em; 
+            cursor: pointer; 
+            transition: background 0.3s ease, transform 0.2s ease; 
+            margin: 5px; 
+        }
+        .button:hover { 
+            background: #009688; 
+            transform: translateY(-2px); 
+        }
+        .button:disabled { 
+            background: #444; 
+            color: #777; 
+            cursor: not-allowed; 
+        }
+        .status { 
+            margin-top: 10px; 
+            font-size: 0.9em; 
+            color: #00BFA5; 
+        }
+        .wallet-info { 
+            color: #00BFA5; 
+            font-weight: 600; 
+            word-break: break-all; 
+        }
+        .loading { 
+            opacity: 0.7; 
+            pointer-events: none; 
+        }
+        .footer { 
+            text-align: center; 
+            margin-top: 30px; 
+            font-size: 0.85em; 
+            color: #666; 
+        }
+        .footer a { 
+            color: #00BFA5; 
+            text-decoration: none; 
+        }
+        .footer a:hover { 
+            text-decoration: underline; 
+        }
+        .how-it-works { 
+            background: #222222; 
+            padding: 20px; 
+            border-radius: 8px; 
+            border: 1px solid #00BFA5; 
+            margin-top: 20px; 
+        }
+        .how-it-works ul { 
+            list-style-type: disc; 
+            padding-left: 20px; 
+            margin-top: 10px; 
+        }
+        .how-it-works li { 
+            margin-bottom: 12px; 
+            font-size: 0.9em; 
+        }
+        .how-it-works .highlight { 
+            color: #00BFA5; 
+            font-weight: 600; 
+        }
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .section, .how-it-works { padding: 15px; }
+            .button { width: 100%; padding: 12px; margin: 8px 0; }
+            .how-it-works ul { padding-left: 15px; }
+            .how-it-works li { font-size: 0.85em; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>XDOG Minting</h1>
+        <div class="section">
+            <h2>Connect to X Layer</h2>
+            <button id="connectButton" class="button">Connect Wallet</button>
+            <p>Wallet: <span id="walletAddress" class="wallet-info">Not connected</span></p>
+            <div id="networkStatus" class="status">Click to connect...</div>
+        </div>
+        <div class="section" id="mintTokenSection">
+            <h2>Mint XDOG Tokens</h2>
+            <p>Token: XDOG (DOGX) | Address: <a href="https://www.okx.com/web3/explorer/xlayer/address/0xa383a75ee8cae132cb51f615d6716770b77ca5aa" target="_blank">0xa383...a5aa</a></p>
+            <p>Each mint creates <span class="highlight">100,000,000,000 DOGX</span> for you (80%) and airdrops 20% to 160 random addresses. Max supply: <span class="highlight">1,000,000,000,000,000 DOGX</span>.</p>
+            <button id="mintToken" class="button">Mint XDOG</button>
+            <div id="mintStatus" class="status"></div>
+        </div>
+        <div class="how-it-works">
+            <h2>How It Works?</h2>
+            <p>Mint XDOG tokens on X Layer with ease:</p>
+            <ul>
+                <li><strong>Connect Your Wallet</strong>: Use MetaMask to connect to X Layer (chain ID: 196). Ensure you have enough <span class="highlight">OKB</span> for gas fees.</li>
+                <li><strong>Mint XDOG Tokens</strong>: Click "Mint XDOG" to receive 80% of 100,000,000,000 DOGX tokens. The remaining 20% is airdropped to 160 random addresses.</li>
+                <li><strong>Check Your Balance</strong>: View your XDOG balance in your wallet or on the X Layer explorer.</li>
+                <li><strong>Fair & Secure</strong>: Built on X Layer for low fees and secure minting. The contract is decentralized with ownership renounced.</li>
+            </ul>
+        </div>
+        <div class="footer">
+            Powered by <a href="https://www.okx.com/web3/explorer/xlayer" target="_blank">X Layer</a> | XDOG Minting © 2025
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.0/dist/web3.min.js"></script>
+    <script>
+        let web3, accounts, xdogContract;
+        const xdogAddress = "0xa383a75ee8cae132cb51f615d6716770b77ca5aa";
+
+        const xdogABI = [
+            {
+                "inputs": [],
+                "name": "mint",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "name",
+                "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "symbol",
+                "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "totalSupply",
+                "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    { "indexed": true, "internalType": "address", "name": "from", "type": "address" },
+                    { "indexed": true, "internalType": "address", "name": "to", "type": "address" },
+                    { "indexed": false, "internalType": "uint256", "name": "value", "type": "uint256" }
+                ],
+                "name": "Transfer",
+                "type": "event"
+            }
+        ];
+
+        const xLayer = {
+            chainId: 196,
+            name: 'X Layer mainnet',
+            explorerUrl: 'https://www.okx.com/web3/explorer/xlayer',
+            rpcUrl: 'https://rpc.xlayer.tech'
+        };
+
+        async function connectWallet() {
+            const status = document.getElementById('networkStatus');
+            try {
+                if (!window.ethereum) {
+                    status.innerHTML = 'No wallet detected. Please install <a href="https://metamask.io" target="_blank">MetaMask</a>.';
+                    throw new Error("No wallet detected");
+                }
+                status.innerText = "Connecting...";
+                web3 = new Web3(window.ethereum);
+                accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (!accounts.length) {
+                    throw new Error("Please unlock your wallet or connect it.");
+                }
+                const chainId = await web3.eth.getChainId();
+                if (chainId !== 196) {
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0xc4' }]
+                        });
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0xc4',
+                                    chainName: 'X Layer mainnet',
+                                    nativeCurrency: { name: 'OKB', symbol: 'OKB', decimals: 18 },
+                                    rpcUrls: ['https://rpc.xlayer.tech'],
+                                    blockExplorerUrls: ['https://www.okx.com/web3/explorer/xlayer']
+                                }]
+                            });
+                        } else {
+                            throw switchError;
+                        }
+                    }
+                }
+                document.getElementById('walletAddress').innerText = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
+                xdogContract = new web3.eth.Contract(xdogABI, xdogAddress);
+                status.innerText = "Connected to X Layer";
+            } catch (error) {
+                console.error(error);
+                status.innerText = "Failed to connect: " + error.message;
+            }
+        }
+
+        async function mintToken() {
+            const section = document.getElementById('mintTokenSection');
+            const status = document.getElementById('mintStatus');
+            if (!accounts) return alert("Please connect your wallet first!");
+            try {
+                section.classList.add('loading');
+                status.innerText = "Minting XDOG tokens...";
+                const gasPrice = await web3.eth.getGasPrice();
+                const adjustedGasPrice = web3.utils.toBN(gasPrice).mul(web3.utils.toBN(15)).div(web3.utils.toBN(10));
+                const tx = await xdogContract.methods.mint().send({
+                    from: accounts[0],
+                    gas: '5000000', // Increased gas limit due to airdrop loop
+                    gasPrice: adjustedGasPrice
+                });
+                status.innerHTML = `Minted 100,000,000,000 DOGX! Check: <a href="${xLayer.explorerUrl}/tx/${tx.transactionHash}" target="_blank">Transaction</a>`;
+            } catch (error) {
+                console.error(error);
+                status.innerText = "Failed to mint XDOG: " + (error.message.includes('revert') ? error.message.split('revert')[1]?.trim() || 'Unknown reason' : error.message);
+            } finally {
+                section.classList.remove('loading');
+            }
+        }
+
+        document.getElementById('connectButton').addEventListener('click', connectWallet);
+        document.getElementById('mintToken').addEventListener('click', mintToken);
+
+        window.addEventListener('load', () => {
+            if (!window.location.protocol.startsWith('http')) {
+                document.getElementById('networkStatus').innerHTML = 'Please run this page via a local server (e.g., "npx serve") to connect MetaMask.';
+            } else if (!window.ethereum) {
+                document.getElementById('networkStatus').innerHTML = 'No wallet detected. Please install <a href="https://metamask.io">MetaMask</a>.';
+            }
+        });
+    </script>
+</body>
+</html>
